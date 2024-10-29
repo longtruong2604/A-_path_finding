@@ -13,11 +13,13 @@ class Cell:
         self.type = type
         self.count = math.inf
         self.mark = CellMark.No
-        self.path_from = None
+        self.path_from: None | Cell = None
         self.pos = pos
 
+    def __lt__(self, other):
+        return self.count < other.count
+
     def is_start(self):
-        print(self.mark, CellMark.Start)
         return self.mark == CellMark.Start
 
     def is_end(self):
@@ -72,7 +74,7 @@ class CellGrid:
         """Sets the end cell."""
         return self.board[self.end[0]][self.end[1]]
 
-    def get_neighbors(self, pos: tuple[int, int]) -> list[tuple[int, int]]:
+    def get_neighbors(self, pos: tuple[int, int]) -> list[Cell]:
         """Returns a list of neighboring cells that are empty."""
         neighbors = []
         for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
@@ -82,8 +84,7 @@ class CellGrid:
             ):
                 ncell = self.at(ncell_pos)
                 if ncell.type == CellType.Empty:
-                    neighbors.append(ncell.pos)
-                    print(type(ncell.pos))
+                    neighbors.append(ncell)
         return neighbors
 
     # def is_valid_point(self, pos):

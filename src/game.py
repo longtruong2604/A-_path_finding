@@ -4,7 +4,7 @@ from types import CellType
 
 import pygame as pg
 
-from src.a_star import fill_shortest_path
+from src.a_star import backtrack_to_start, fill_shortest_path
 from src.config import GAME_TITLE, GRID_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH
 from src.constant import CellMark
 from src.grid import CellGrid, init_maze
@@ -68,10 +68,12 @@ class Game:
 
     def loop(self):
         """Main application loop."""
+
         while True:
             self.handle_events()
             self.draw(self.screen)
-            self.path = fill_shortest_path(self.board)
+            fill_shortest_path(self.board)
+            # self.path = backtrack_to_start(self.board.get_end())
             pg.display.update()
 
         self.quit()
@@ -109,7 +111,6 @@ class Game:
         cell = self.board.at((pos_x, pos_y))
         if cell:
             # Check if the cell is start or end, then begin dragging it
-            print(cell.is_start())
             if cell.is_start():
                 self.dragging_start = True
             elif cell.is_end():

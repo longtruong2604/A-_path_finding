@@ -1,12 +1,13 @@
-from ast import Dict
 import math
 from queue import PriorityQueue
-from src.grid import CellGrid
+from src.grid import Cell, CellGrid
 from src.utils import heuristic
 
 
 def fill_shortest_path(board: CellGrid, max_distance=math.inf):
-    start, end = board.start, board.end
+    board.clear_count(math.inf)
+    start, end = board.get_start(), board.get_end()
+    start.count = 0
     """Creates a duplicate of the board and fills the `Cell.count` field with the distance from the start to that cell."""
     # nboard = board.clone()
     # nboard.clear_count(math.inf)
@@ -46,37 +47,33 @@ def fill_shortest_path(board: CellGrid, max_distance=math.inf):
 
     frontier = PriorityQueue()
     frontier.put(start, 0)
-    came_from = dict()
-    cost_so_far = dict()
-    print(type(start))
-    came_from[start] = None
-    cost_so_far[start] = 0
+    visited = set()
+    visited.add(start.pos)
 
     while not frontier.empty():
-        current = frontier.get()
+        current: Cell = frontier.get()
 
-        if current == end:
+        if current.pos == end.pos:
             break
 
-        for next in board.get_neighbors(current):
-            print(type(next))
-            new_cost = cost_so_far[current] + 1
-            if next not in cost_so_far or new_cost < cost_so_far[next]:
-                cost_so_far[next] = new_cost
-                priority = new_cost + heuristic(end, next)
+        for next in board.get_neighbors(current.pos):
+            new_cost = current.count + 1
+            if next.pos not in visited or new_cost < next.count:
+                next.count = new_cost
+                next.path_from = current
+                visited.add(next.pos)
+                priority = new_cost + heuristic(end.pos, next.pos)
                 frontier.put(next, priority)
-                came_from[next] = current
-    return backtrack_to_start(came_from, end)
+
+    return 0
 
 
-def backtrack_to_start(
-    came_from: dict[tuple[int, int], tuple[int, int]], end: tuple[int, int]
-):
+def backtrack_to_start(end: Cell):
     """Returns the path to the end, assuming the board has been filled in via fill_shortest_path"""
-    pos = end
+    current = end
     path = []
-    while pos is not None:
-        path.append(pos)
-        pos = came_from[pos]
+    while current.path_from.pos is not None:
+        path.append(current.pos)
+        current = current.path_from
 
     return path
