@@ -89,3 +89,11 @@ def draw_path(
         ctr_a = metrics.cell_rect(path[i]).center
         ctr_b = metrics.cell_rect(path[i + 1]).center
         pg.draw.line(surface, (120, 220, 0), ctr_a, ctr_b, LINE_WIDTH)
+
+
+def manhatan_distance(a: tuple[int, int], b: tuple[int, int]) -> int:
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+
+def heuristic(goal: tuple[int, int], next: tuple[int, int]):
+    return manhatan_distance(goal, next)

@@ -72,6 +72,20 @@ class CellGrid:
         """Sets the end cell."""
         return self.board[self.end[0]][self.end[1]]
 
+    def get_neighbors(self, pos: tuple[int, int]) -> list[tuple[int, int]]:
+        """Returns a list of neighboring cells that are empty."""
+        neighbors = []
+        for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            ncell_pos = add_point(pos, offset)
+            if 0 <= ncell_pos[0] < len(self.board) and 0 <= ncell_pos[1] < len(
+                self.board[0]
+            ):
+                ncell = self.at(ncell_pos)
+                if ncell.type == CellType.Empty:
+                    neighbors.append(ncell.pos)
+                    print(type(ncell.pos))
+        return neighbors
+
     # def is_valid_point(self, pos):
     #     """Checks if a position is within grid boundaries."""
     #     size = self.get_size()
@@ -81,7 +95,7 @@ class CellGrid:
 def init_maze(width: int, height: int):
     """Creates a maze with walls dividing the grid into four sections with some random openings."""
     board = [
-        [Cell(type=CellType.Empty, pos=[x, y]) for y in range(height)]
+        [Cell(type=CellType.Empty, pos=(x, y)) for y in range(height)]
         for x in range(width)
     ]
 
@@ -97,8 +111,8 @@ def init_maze(width: int, height: int):
     board[width // 2][random.randint(0, height // 2 - 1)].type = CellType.Empty
     board[width // 2][random.randint(height // 2 + 1, height - 1)].type = CellType.Empty
 
-    start = [random.randrange(0, width // 2), random.randrange(height // 2 + 1, height)]
-    end = [random.randrange(width // 2 + 1, width), random.randrange(0, height // 2)]
+    start = (random.randrange(0, width // 2), random.randrange(height // 2 + 1, height))
+    end = (random.randrange(width // 2 + 1, width), random.randrange(0, height // 2))
 
     board[start[0]][start[1]].mark = CellMark.Start
     board[end[0]][end[1]].mark = CellMark.End
@@ -109,6 +123,6 @@ def init_maze(width: int, height: int):
     )
 
 
-def add_point(pos_a: tuple[int, int], pos_b: tuple[int, int]):
+def add_point(pos_a: tuple[int, int], pos_b: tuple[int, int]) -> tuple[int, int]:
     """Adds two points represented as [x, y] coordinates."""
-    return [pos_a[0] + pos_b[0], pos_a[1] + pos_b[1]]
+    return (pos_a[0] + pos_b[0], pos_a[1] + pos_b[1])

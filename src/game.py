@@ -4,6 +4,7 @@ from types import CellType
 
 import pygame as pg
 
+from src.a_star import fill_shortest_path
 from src.config import GAME_TITLE, GRID_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH
 from src.constant import CellMark
 from src.grid import CellGrid, init_maze
@@ -29,7 +30,7 @@ class Game:
         self.board: CellGrid = init_maze(
             GRID_SIZE, GRID_SIZE
         ).board  # 2D array of Cell objects
-        self.path = [(0, 0), (1, 2), (2, 3)]  # List of cell positions for the path
+        self.path = None  # List of cell positions for the path
         self.mouse_held = False
         self.toggled_cells = set()  # Track toggled cells during drag
         self.cell_type = None
@@ -70,6 +71,7 @@ class Game:
         while True:
             self.handle_events()
             self.draw(self.screen)
+            self.path = fill_shortest_path(self.board)
             pg.display.update()
 
         self.quit()
