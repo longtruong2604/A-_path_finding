@@ -3,7 +3,7 @@ import pygame as pg
 import math
 
 from src.constant import CellType, CellMark
-from src.config import CELL_COLOR_EMPTY, CELL_COLOR_WALL, CELL_GAP
+from src.config import CELL_COLOR_EMPTY, CELL_COLOR_WALL, CELL_GAP, CELL_SIZE, MARGIN
 from src.grid import CellGrid
 
 
@@ -17,30 +17,26 @@ class BoardMetrics:
         """
         # Board area and spacing
         self.area = area
-        self.left = area[0] + CELL_GAP  # Left boundary with gap
-        self.top = area[1] + CELL_GAP  # Top boundary with gap
-        self.width = area[2] - area[0] - 2 * CELL_GAP  # Width adjusted for gaps
-        self.height = area[3] - area[1] - 2 * CELL_GAP  # Height adjusted for gaps
+        self.left = area[0] + MARGIN  # Left boundary with gap
+        self.top = area[1] + MARGIN  # Top boundary with gap
+        self.width = area[2] - area[0] - 2 * MARGIN  # Width adjusted for gaps
+        self.height = area[3] - area[1] - 2 * MARGIN  # Height adjusted for gaps
 
         # Grid dimensions
-        self.num_x, self.num_y = board.get_size()  # Unpack grid size as (num_x, num_y)
-
-        # Cell dimensions
-        self.cx = self.width / self.num_x  # Cell width
-        self.cy = self.height / self.num_y  # Cell height
+        self.pos_x, self.pos_y = board.get_size()  # Unpack grid size as (num_x, num_y)
 
     def cell_rect(self, pos: tuple[int, int]) -> pg.Rect:
         """Get the rectangle of a cell at `pos`."""
         return [
-            self.left + pos[0] * self.cx,
-            self.top + pos[1] * self.cy,
-            self.cx - CELL_GAP,
-            self.cy - CELL_GAP,
+            self.left + pos[0] * (CELL_SIZE + CELL_GAP),
+            self.top + pos[1] * (CELL_SIZE + CELL_GAP),
+            CELL_SIZE,
+            CELL_SIZE,
         ]
 
-    def cell_center(self, pos: tuple[int, int]) -> tuple[int, int]:
-        rct = self.cell_rect(pos)
-        return [rct[0] + rct[2] // 2, rct[1] + rct[3] // 2]
+    # def cell_center(self, pos: tuple[int, int]) -> tuple[int, int]:
+    #     rct = self.cell_rect(pos)
+    #     return [rct[0] + rct[2] // 2, rct[1] + rct[3] // 2]
 
 
 def trans_rect(r, off):
@@ -61,8 +57,8 @@ def draw_board(surface: pg.Surface, area: pg.Rect, board: CellGrid):
         CellMark.Start: (0, 255, 0),
         CellMark.End: (255, 0, 0),
     }
-    for y in range(0, metrics.num_y):
-        for x in range(0, metrics.num_x):
+    for y in range(0, metrics.pos_y):
+        for x in range(0, metrics.pos_x):
             cell = board.at([x, y])
             # Explicitly annotate the return type to indicate it's an RGB tuple
             clr: tuple[int, int, int] = colors.get(cell.type, (100, 100, 0))

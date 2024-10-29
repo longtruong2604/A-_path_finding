@@ -1,4 +1,5 @@
 import pygame
+from src.config import CELL_SIZE
 from src.game import Game
 
 
@@ -9,4 +10,5 @@ def main():
 
 
 if __name__ == "__main__":
+    print(CELL_SIZE)
     main()
