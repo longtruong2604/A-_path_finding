@@ -1,3 +1,4 @@
+import math
 import sys
 from types import CellType
 
@@ -28,7 +29,7 @@ class Game:
         self.board: CellGrid = init_maze(
             GRID_SIZE, GRID_SIZE
         ).board  # 2D array of Cell objects
-        self.path = None
+        self.path = [(0, 0), (1, 2), (2, 3)]  # List of cell positions for the path
         self.mouse_held = False
         self.toggled_cells = set()  # Track toggled cells during drag
         self.cell_type = None
@@ -131,6 +132,7 @@ class Game:
 
         # If dragging start or end, update their positions
         if self.dragging_start:
+            self.board.get_start().count = math.inf
             self.board.get_start().mark = CellMark.No  # Clear previous start cell
             self.board.set_start((pos_x, pos_y))  # Move start to new position
         elif self.dragging_end:
@@ -160,5 +162,5 @@ class Game:
             return
         draw_board(surface, surface.get_rect(), self.board)
         # Uncomment if you want to draw paths
-        # if self.path is not None:
-        #     draw_path(surface, surface.get_rect(), self.board, self.path)
+        if self.path is not None:
+            draw_path(surface, surface.get_rect(), self.board, self.path)

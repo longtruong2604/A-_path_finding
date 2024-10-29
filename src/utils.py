@@ -3,7 +3,14 @@ import pygame as pg
 import math
 
 from src.constant import CellType, CellMark
-from src.config import CELL_COLOR_EMPTY, CELL_COLOR_WALL, CELL_GAP, CELL_SIZE, MARGIN
+from src.config import (
+    CELL_COLOR_EMPTY,
+    CELL_COLOR_WALL,
+    CELL_GAP,
+    CELL_SIZE,
+    LINE_WIDTH,
+    MARGIN,
+)
 from src.grid import CellGrid
 
 
@@ -27,20 +34,12 @@ class BoardMetrics:
 
     def cell_rect(self, pos: tuple[int, int]) -> pg.Rect:
         """Get the rectangle of a cell at `pos`."""
-        return [
+        return pg.Rect(
             self.left + pos[0] * (CELL_SIZE + CELL_GAP),
             self.top + pos[1] * (CELL_SIZE + CELL_GAP),
             CELL_SIZE,
             CELL_SIZE,
-        ]
-
-    # def cell_center(self, pos: tuple[int, int]) -> tuple[int, int]:
-    #     rct = self.cell_rect(pos)
-    #     return [rct[0] + rct[2] // 2, rct[1] + rct[3] // 2]
-
-
-def trans_rect(r, off):
-    return [r[0] + off[0], r[1] + off[1], r[2], r[3]]
+        )
 
 
 # surface = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -67,29 +66,26 @@ def draw_board(surface: pg.Surface, area: pg.Rect, board: CellGrid):
             pg.draw.rect(surface, clr, cell_rect)
 
             if cell.count != math.inf:
-                number = cell_font.render(
-                    "{}".format(cell.count), True, (255, 255, 255)
-                )
-                surface.blit(
-                    number,
-                    trans_rect(
-                        number.get_rect(),
-                        [
-                            cell_rect[0] + (cell_rect[2] - number.get_rect()[2]) // 2,
-                            cell_rect[1] + (cell_rect[3] - number.get_rect()[3]) // 2,
-                        ],
-                    ),
-                )
+                count_text = cell_font.render(str(cell.count), True, (255, 255, 255))
+
+                cell_x, cell_y, cell_width, cell_height = cell_rect
+                text_width, text_height = count_text.get_rect().size
+
+                text_x = cell_x + (cell_width - text_width) / 2
+                text_y = cell_y + (cell_height - text_height) / 2
+
+                surface.blit(count_text, (text_x, text_y))
 
             mark = marks.get(cell.mark, None)
             if mark is not None:
-                pg.draw.rect(surface, mark, cell_rect, CELL_GAP)
+                pg.draw.rect(surface, mark, cell_rect, LINE_WIDTH)
 
 
-def draw_path(surface: pg.Surface, area: pg.Rect, board: CellGrid, path):
-    pass
-    # metrics = BoardMetrics(area, board)
-    # for i in range(0, len(path) - 1):
-    #     ctr_a = metrics.cell_center(path[i].pos)
-    #     ctr_b = metrics.cell_center(path[i + 1].pos)
-    #     pg.draw.line(surface, (120, 220, 0), ctr_a, ctr_b, metrics.gap)
+def draw_path(
+    surface: pg.Surface, area: pg.Rect, board: CellGrid, path=[(0, 1), (1, 2)]
+):
+    metrics = BoardMetrics(area, board)
+    for i in range(0, len(path) - 1):
+        ctr_a = metrics.cell_rect(path[i]).center
+        ctr_b = metrics.cell_rect(path[i + 1]).center
+        pg.draw.line(surface, (120, 220, 0), ctr_a, ctr_b, LINE_WIDTH)

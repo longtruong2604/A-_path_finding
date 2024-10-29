@@ -1,14 +1,17 @@
+from __future__ import annotations  # For forward reference of CellGrid
+
 import copy
+import math
 import random
 import types
 
-from src.constant import CellType, CellMark
+from src.constant import CellMark, CellType
 
 
 class Cell:
     def __init__(self, type=CellType.Empty, pos=None):
         self.type = type
-        self.count = 0
+        self.count = math.inf
         self.mark = CellMark.No
         self.path_from = None
         self.pos = pos
@@ -26,36 +29,37 @@ class Cell:
 
 
 class CellGrid:
-    def __init__(self, board, start=None, end=None):
+    def __init__(self, board: list[list[Cell]], start=None, end=None):
         self.board = board
-        self.start = start
-        self.end = end
+        self.set_start(start)
+        self.set_end(end)
 
     def get_size(self) -> tuple[int, int]:
         """Returns the size of the grid as (width, height)."""
         return (len(self.board), len(self.board[0]))  # Using a tuple
 
-    def at(self, pos) -> Cell:
+    def at(self, pos: tuple[int, int]) -> Cell:
         """Returns the cell at a given position."""
         return self.board[pos[0]][pos[1]]
 
-    def clone(self):
+    def clone(self) -> CellGrid:
         """Creates a deep copy of the grid."""
         return CellGrid(copy.deepcopy(self.board))
 
-    def clear_count(self, count):
+    def clear_count(self, count: int) -> None:
         """Resets all cell counts to a specific value, typically used to clear path data."""
         for row in self.board:
             for cell in row:
                 cell.count = count
                 cell.path_from = None
 
-    def set_start(self, pos):
+    def set_start(self, pos: tuple[int, int]) -> None:
         """Sets the start cell."""
         self.start = pos
         self.at(pos).mark = CellMark.Start
+        self.at(pos).count = 0
 
-    def set_end(self, pos):
+    def set_end(self, pos: tuple[int, int]) -> None:
         """Sets the end cell."""
         self.end = pos
         self.at(pos).mark = CellMark.End
@@ -105,6 +109,6 @@ def init_maze(width: int, height: int):
     )
 
 
-def add_point(a, b):
+def add_point(pos_a: tuple[int, int], pos_b: tuple[int, int]):
     """Adds two points represented as [x, y] coordinates."""
-    return [a[0] + b[0], a[1] + b[1]]
+    return [pos_a[0] + pos_b[0], pos_a[1] + pos_b[1]]
