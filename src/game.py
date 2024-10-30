@@ -68,12 +68,16 @@ class Game:
 
     def loop(self):
         """Main application loop."""
+        # start_time = pg.time.get_ticks()  # Record the start time
 
         while True:
+            # elapsed_time = pg.time.get_ticks() - start_time
+            # if elapsed_time >= 30:  # Check if 1 second (1000 ms) has passed
+            #     break
             self.handle_events()
             self.draw(self.screen)
             fill_shortest_path(self.board)
-            # self.path = backtrack_to_start(self.board.get_end())
+            self.path = backtrack_to_start(self.board.get_end())
             pg.display.update()
 
         self.quit()

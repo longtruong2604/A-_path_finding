@@ -46,34 +46,43 @@ def fill_shortest_path(board: CellGrid, max_distance=math.inf):
     #             open_list.append(ncell_pos)
 
     frontier = PriorityQueue()
-    frontier.put(start, 0)
+    frontier.put((0, start))
     visited = set()
     visited.add(start.pos)
-
+    print("start", start.pos, start.count)
+    print("end", end.pos, end.count)
     while not frontier.empty():
-        current: Cell = frontier.get()
-
-        if current.pos == end.pos:
-            break
-
+        print("---")
+        [print(item[0], item[1].pos) for item in frontier.queue]
+        print("---")
+        _, current = frontier.get()
+        print("current", current.pos, current.count)
+        # if current.pos == end.pos:
+        #     break
+        flag = False
         for next in board.get_neighbors(current.pos):
             new_cost = current.count + 1
             if next.pos not in visited or new_cost < next.count:
                 next.count = new_cost
                 next.path_from = current
+                if next.pos == end.pos:
+                    flag = True
                 visited.add(next.pos)
                 priority = new_cost + heuristic(end.pos, next.pos)
-                frontier.put(next, priority)
-
-    return 0
+                frontier.put((priority, next))
+        if flag:
+            return
 
 
 def backtrack_to_start(end: Cell):
-    """Returns the path to the end, assuming the board has been filled in via fill_shortest_path"""
+    """Returns the path from the start to the end, assuming the board has been filled in via fill_shortest_path"""
     current = end
     path = []
-    while current.path_from.pos is not None:
+
+    while current is not None:
         path.append(current.pos)
         current = current.path_from
 
+    # Reverse the path to go from start to end
+    path.reverse()
     return path
