@@ -44,7 +44,7 @@ class BoardMetrics:
 
 # surface = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 def draw_board(surface: pg.Surface, area: pg.Rect, board: CellGrid):
-    cell_font = pg.font.SysFont(pg.font.get_default_font(), 25)
+    cell_font = pg.font.SysFont(pg.font.get_default_font(), 15)
     pg.draw.rect(surface, (0, 0, 0), area)  # color of the board
     metrics = BoardMetrics(area, board)
 
@@ -100,4 +100,4 @@ def euclidean_distance(a: tuple[int, int], b: tuple[int, int]) -> float:
 
 
 def heuristic(goal: tuple[int, int], next: tuple[int, int]):
-    return euclidean_distance(goal, next)
+    return manhatan_distance(goal, next)

@@ -4,7 +4,7 @@ from src.grid import Cell, CellGrid
 from src.utils import heuristic
 
 
-def fill_shortest_path(board: CellGrid, max_distance=math.inf):
+def fill_shortest_path(board: CellGrid, n=math.inf):
     board.clear_count(math.inf)
     start, end = board.get_start(), board.get_end()
     start.count = 0
@@ -51,14 +51,12 @@ def fill_shortest_path(board: CellGrid, max_distance=math.inf):
     visited.add(start.pos)
     print("start", start.pos, start.count)
     print("end", end.pos, end.count)
-    while not frontier.empty():
-        print("---")
-        [print(item[0], item[1].pos) for item in frontier.queue]
-        print("---")
-        _, current = frontier.get()
-        print("current", current.pos, current.count)
+    while n > 0 and not frontier.empty():
+        [print(p[0], p[1].pos, p[1].count) for p in frontier.queue]
+        p, current = frontier.get()
         # if current.pos == end.pos:
         #     break
+        print("current", current.pos, current.count, p)
         flag = False
         for next in board.get_neighbors(current.pos):
             new_cost = current.count + 1
@@ -72,6 +70,7 @@ def fill_shortest_path(board: CellGrid, max_distance=math.inf):
                 frontier.put((priority, next))
         if flag:
             return
+        n -= 1
 
 
 def backtrack_to_start(end: Cell):

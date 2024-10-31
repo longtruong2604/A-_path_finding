@@ -1,20 +1,33 @@
 import math
 import sys
-from types import CellType
 
 import pygame as pg
 
 from src.a_star import backtrack_to_start, fill_shortest_path
-from src.config import GAME_TITLE, GRID_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH
+from src.config import (
+    GAME_TITLE,
+    GRID_SIZE,
+    SCREEN_HEIGHT,
+    BOARD_SIZE,
+    SLIDER_HEIGHT,
+    SLIDER_WIDTH,
+)
 from src.constant import CellMark
 from src.grid import CellGrid, init_maze
+from src.ui import Slider
 from src.utils import draw_board, draw_path
 
 
 class Game:
     def __init__(self):
         pg.init()
-        self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.screen = pg.display.set_mode((BOARD_SIZE, SCREEN_HEIGHT))
+        self.slider = Slider(
+            (BOARD_SIZE - SLIDER_WIDTH) // 2,
+            (BOARD_SIZE + SCREEN_HEIGHT - SLIDER_HEIGHT) // 2,
+            SLIDER_WIDTH,
+            SLIDER_HEIGHT,
+        )
         pg.display.set_caption(GAME_TITLE)
         self.init_states()
 
@@ -36,6 +49,7 @@ class Game:
         self.cell_type = None
         self.dragging_start = False
         self.dragging_end = False
+        self.steps = math.inf
 
         """
         # Initialize all the states
@@ -76,7 +90,7 @@ class Game:
             #     break
             self.handle_events()
             self.draw(self.screen)
-            fill_shortest_path(self.board)
+            fill_shortest_path(self.board, self.steps)
             self.path = backtrack_to_start(self.board.get_end())
             pg.display.update()
 
@@ -101,17 +115,24 @@ class Game:
         if event.key == pg.K_ESCAPE:
             self.quit()
         elif event.key == pg.K_RIGHT:
-            self.step(1)
+            self.steps += 1
         elif event.key == pg.K_LEFT:
-            self.step(-1)
+            self.steps -= 1
         elif event.key == pg.K_r:
             self.reset()
 
     def start_drag(self):
         """Start a drag operation by toggling the initial cell and setting up for dragging."""
+        mouse_x, mouse_y = pg.mouse.get_pos()
         self.mouse_held = True
         self.toggled_cells.clear()  # Clear the toggled cells set for a new drag
-        pos_x, pos_y = self.get_cell_position()
+        if self.slider.on_slider(mouse_x, mouse_y):
+            print("on slider")
+            self.slider.handle_event(self.screen, mouse_x, self.update_step)
+            return
+        pos_x = mouse_x // (BOARD_SIZE // GRID_SIZE)
+        pos_y = mouse_y // (BOARD_SIZE // GRID_SIZE)
+
         cell = self.board.at((pos_x, pos_y))
         if cell:
             # Check if the cell is start or end, then begin dragging it
@@ -134,6 +155,12 @@ class Game:
 
     def drag_toggle(self):
         """Toggle cells as the mouse moves while holding down the button, or move start/end cell."""
+        mouse_x, mouse_y = pg.mouse.get_pos()
+        if self.slider.on_slider_hold(mouse_x, mouse_y):
+            print("on slider hold")
+            self.slider.handle_event(self.screen, mouse_x, self.update_step)
+            return
+
         pos_x, pos_y = self.get_cell_position()
         cell = self.board.at((pos_x, pos_y))
 
@@ -154,8 +181,8 @@ class Game:
     def get_cell_position(self):
         """Calculate the cell position based on the current mouse position."""
         mouse_x, mouse_y = pg.mouse.get_pos()
-        pos_x = mouse_x // (SCREEN_WIDTH // GRID_SIZE)
-        pos_y = mouse_y // (SCREEN_HEIGHT // GRID_SIZE)
+        pos_x = mouse_x // (BOARD_SIZE // GRID_SIZE)
+        pos_y = mouse_y // (BOARD_SIZE // GRID_SIZE)
         return pos_x, pos_y
 
     def quit(self):
@@ -168,6 +195,10 @@ class Game:
         if self.board is None:
             return
         draw_board(surface, surface.get_rect(), self.board)
+        self.slider.draw(surface)
         # Uncomment if you want to draw paths
         if self.path is not None:
             draw_path(surface, surface.get_rect(), self.board, self.path)
+
+    def update_step(self, new_steps):
+        self.steps = new_steps

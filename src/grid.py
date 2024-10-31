@@ -113,10 +113,55 @@ def init_maze(width: int, height: int):
     board[width // 2][random.randint(height // 2 + 1, height - 1)].type = CellType.Empty
 
     start = (random.randrange(0, width // 2), random.randrange(height // 2 + 1, height))
+    # stack = [start]
+    # visited = set()
+    # visited.add(start)
     end = (random.randrange(width // 2 + 1, width), random.randrange(0, height // 2))
-
     board[start[0]][start[1]].mark = CellMark.Start
     board[end[0]][end[1]].mark = CellMark.End
+    # Set the start cell to be empty
+    board[start[0]][start[1]].type = CellType.Empty
+
+    # while stack:
+    #     current_x, current_y = stack.pop()
+
+    #     # Get all potential neighbors by skipping one cell in between (for walls)
+    #     unvisited_neighbors = []
+    #     for dx, dy in [(2, 0), (-2, 0), (0, 2), (0, -2)]:
+    #         neighbor_x, neighbor_y = current_x + dx, current_y + dy
+
+    #         # Check if the neighbor is within bounds and unvisited
+    #         if (
+    #             0 <= neighbor_x < width
+    #             and 0 <= neighbor_y < height
+    #             and (neighbor_x, neighbor_y) not in visited
+    #         ):
+    #             unvisited_neighbors.append((neighbor_x, neighbor_y))
+
+    #     # If there are unvisited neighbors, proceed with backtracking steps
+    #     if unvisited_neighbors:
+    #         # Push the current cell back to the stack for further exploration
+    #         stack.append((current_x, current_y))
+
+    #         # Choose a random unvisited neighbor
+    #         neighbor_x, neighbor_y = random.choice(unvisited_neighbors)
+
+    #         # Remove the wall between the current cell and the chosen neighbor
+    #         between_x, between_y = (
+    #             (current_x + neighbor_x) // 2,
+    #             (current_y + neighbor_y) // 2,
+    #         )
+    #         board[between_x][
+    #             between_y
+    #         ].type = CellType.Empty  # Make the wall between cells empty
+
+    #         # Mark the neighbor as visited and push it to the stack
+    #         visited.add((neighbor_x, neighbor_y))
+    #         board[neighbor_x][
+    #             neighbor_y
+    #         ].type = CellType.Empty  # Make the neighbor cell empty
+    #         stack.append((neighbor_x, neighbor_y))
+
     return types.SimpleNamespace(
         board=CellGrid(board, start, end),
         start=start,
