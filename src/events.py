@@ -29,7 +29,7 @@ def start_drag(self):
     self.toggled_cells.clear()  # Clear the toggled cells set for a new drag
     if self.slider.on_slider(mouse_x, mouse_y):
         self.slider.is_dragging = True
-        self.slider.handle_drag(self.screen, mouse_x, self.update_step)
+        self.slider.handle_drag(mouse_x, self.update_step)
         return
 
     pos_x, pos_y = (
@@ -67,7 +67,7 @@ def drag_toggle(self):
     """Toggle cells as the mouse moves while holding down the button, or move start/end cell."""
     mouse_x, mouse_y = pg.mouse.get_pos()
     if self.slider.is_dragging:
-        self.slider.handle_drag(self.screen, mouse_x, self.update_step)
+        self.slider.handle_drag(mouse_x, self.update_step)
         return
 
     pos_x = mouse_x // (BOARD_SIZE // GRID_SIZE)

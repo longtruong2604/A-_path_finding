@@ -1,26 +1,28 @@
 # Tùy chỉnh các thông số cố định UI
 
-GAME_TITLE = "A* Pathfinding"
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = SCREEN_WIDTH + 200
-MARGIN = 5
+GAME_TITLE = "A* Pathfinding"  # Tên cửa sổ
+SCREEN_WIDTH = 800  # Chiều rộng cửa sổ
+SCREEN_HEIGHT = SCREEN_WIDTH + 200  # Chiều cao cửa sổ
+MARGIN = 5  # Lề
 
-BOARD_SIZE = SCREEN_WIDTH
-GRID_SIZE = 15
-CELL_COLOR_EMPTY = (40, 100, 40)
-CELL_COLOR_WALL = (255, 100, 0)
-CELL_GAP = 1
-CELL_SIZE = (BOARD_SIZE - 2 * MARGIN - ((GRID_SIZE - 1) * CELL_GAP)) / GRID_SIZE
-PATH_LINE_WIDTH = 3
+BOARD_SIZE = SCREEN_WIDTH  # Kích thước bảng === chiều rộng cửa sổ
+GRID_SIZE = 15  # Số ô trên mỗi hàng và cột
+CELL_COLOR_EMPTY = (40, 100, 40)  # Màu ô trống
+CELL_COLOR_WALL = (255, 100, 0)  # Màu của ô vật cản
+CELL_GAP = 1  # Khoảng cách giữa các ô
+CELL_SIZE = (
+    BOARD_SIZE - 2 * MARGIN - ((GRID_SIZE - 1) * CELL_GAP)
+) / GRID_SIZE  # Kích thước hình vuông của mỗi ô
+PATH_LINE_WIDTH = 3  # Độ dày của đường đi
 
-FONT_SIZE = round(CELL_SIZE) // 2
-FONT_COLOR = (255, 255, 255)
+FONT_SIZE = round(CELL_SIZE) // 2  # Cỡ chữ
+FONT_COLOR = (255, 255, 255)  # Màu chữ
 
-SLIDER_WIDTH = SCREEN_WIDTH // 2
-SLIDER_HEIGHT = 20
-SLIDER_BAR_COLOR = (100, 100, 100)
-SLIDER_THUMB_SIZE = SLIDER_HEIGHT * 1.5
-SLIDER_THUMB_COLOR = (255, 255, 255)
+SLIDER_WIDTH = SCREEN_WIDTH // 2  # Chiều rộng thanh trượt
+SLIDER_HEIGHT = 20  # Chiều cao thanh trượt
+SLIDER_BAR_COLOR = (100, 100, 100)  # Màu của thanh trượt
+SLIDER_THUMB_SIZE = SLIDER_HEIGHT * 1.5  # Kích thước nút trượt
+SLIDER_THUMB_COLOR = (255, 255, 255)  # Màu của nút trượt
 
-ARROW_COLOR = (255, 255, 255)
-ARROW_SIZE = 2
+ARROW_COLOR = (255, 255, 255)  # Màu mũi tên
+ARROW_SIZE = 2  # Độ dày mũi tên
