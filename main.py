@@ -1,5 +1,4 @@
 import pygame
-from src.config import CELL_SIZE
 from src.game import Game
 
 
