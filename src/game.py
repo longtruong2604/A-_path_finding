@@ -97,25 +97,27 @@ class Game:
         ]
         # Mảng 2 chiều chứa các ô kiểu Cell
 
-        # # Adding walls in the middle row and column
-        # for x in range(width):
-        #     grid[x][height // 2].type = CellType.Wall
-        # for y in range(height):
-        #     grid[width // 2][y].type = CellType.Wall
+        # Adding walls in the middle row and column
+        for x in range(width):
+            grid[x][height // 2].type = CellType.Wall
+        for y in range(height):
+            grid[width // 2][y].type = CellType.Wall
 
-        # # Creating openings in the walls
-        # grid[random.randint(0, width // 2 - 1)][height // 2].type = CellType.Empty
-        # grid[random.randint(width // 2 + 1, width - 1)][height // 2].type = CellType.Empty
-        # grid[width // 2][random.randint(0, height // 2 - 1)].type = CellType.Empty
-        # grid[width // 2][random.randint(height // 2 + 1, height - 1)].type = CellType.Empty
+        # Creating openings in the walls
+        grid[random.randint(0, width // 2 - 1)][height // 2].type = CellType.Empty
+        grid[random.randint(width // 2 + 1, width - 1)][
+            height // 2
+        ].type = CellType.Empty
+        grid[width // 2][random.randint(0, height // 2 - 1)].type = CellType.Empty
+        grid[width // 2][
+            random.randint(height // 2 + 1, height - 1)
+        ].type = CellType.Empty
 
         start = (
             random.randrange(0, width // 2),
             random.randrange(height // 2 + 1, height),
         )
-        # stack = [start]
-        # visited = set()
-        # visited.add(start)
+
         end = (
             random.randrange(width // 2 + 1, width),
             random.randrange(0, height // 2),
@@ -134,3 +136,20 @@ class Game:
 
     def update_step(self, x):
         self.step = x
+
+    def reset(self):
+        """
+        Tạo một lưới mới với các cài đặt ngẫu nhiên.
+        """
+        self.grid: CellGrid = self.init_grid(GRID_SIZE, GRID_SIZE)
+        self.slider = Slider(
+            (BOARD_SIZE - SLIDER_WIDTH) // 2,
+            (BOARD_SIZE + SCREEN_HEIGHT - SLIDER_HEIGHT) // 2,
+            SLIDER_WIDTH,
+            SLIDER_HEIGHT,
+        )
+
+        self.path = None  # Đường đi từ vị trí đầu đến cuối
+        self.mouse_held = False
+        self.step = 0  # Bước đi trong quá trình tìm đường
+        self.mode = Mode.Cost  # Chế độ hiển thị mặc định
