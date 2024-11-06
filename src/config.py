@@ -7,8 +7,8 @@ MARGIN = 5  # Lề
 
 BOARD_SIZE = SCREEN_WIDTH  # Kích thước bảng === chiều rộng cửa sổ
 GRID_SIZE = 15  # Số ô trên mỗi hàng và cột
-CELL_COLOR_EMPTY = (40, 100, 40)  # Màu ô trống
-CELL_COLOR_WALL = (255, 100, 0)  # Màu của ô vật cản
+CELL_COLOR_EMPTY = (60, 60, 60)  # Màu ô trống
+CELL_COLOR_WALL = (139, 69, 19)  # Màu của ô vật cản
 CELL_GAP = 1  # Khoảng cách giữa các ô
 CELL_SIZE = (
     BOARD_SIZE - 2 * MARGIN - ((GRID_SIZE - 1) * CELL_GAP)

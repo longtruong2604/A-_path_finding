@@ -55,7 +55,8 @@ def a_star(grid: CellGrid, step: int) -> int:
                     next.update_cell(new_cost, priority, current)
                     # Cập nhật thông tin của ô lân cận bao gồm số bước, trọng số, tọa độ ô hiện tại (để truy vết)
                     # để hiển thị trên lưới nếu số bước (step) còn lớn hơn 0
-
+                if step == 1:
+                    current.is_current = True  # Đánh dấu ô hiện tại là ô đang được xét
         max_steps += 1
         step -= 1
 

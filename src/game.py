@@ -24,14 +24,6 @@ class Game:
         pg.display.set_caption(GAME_TITLE)
 
         self.grid: CellGrid = self.init_grid(GRID_SIZE, GRID_SIZE)
-        self.path = None  # List of cell positions for the path
-        self.mouse_held = False
-        self.toggled_cells = set()  # Track toggled cells during drag
-        self.cell_type = None
-        self.dragging_start = False
-        self.dragging_end = False
-        self.step = 0
-        self.mode = Mode.Cost
         self.slider = Slider(
             (BOARD_SIZE - SLIDER_WIDTH) // 2,
             (BOARD_SIZE + SCREEN_HEIGHT - SLIDER_HEIGHT) // 2,
@@ -39,25 +31,30 @@ class Game:
             SLIDER_HEIGHT,
         )
 
-    def loop(self):
-        """Main application loop."""
-        # start_time = pg.time.get_ticks()  # Record the start time
+        self.path = None  # Đường đi từ vị trí đầu đến cuối
+        self.mouse_held = False
+        self.step = 0  # Bước đi trong quá trình tìm đường
+        self.mode = Mode.Cost  # Chế độ hiển thị mặc định
 
+    def loop(self):
         while True:
-            # elapsed_time = pg.time.get_ticks() - start_time
-            # if elapsed_time >= 30:  # Check if 1 second (1000 ms) has passed
-            #     break
             self.handle_events()
-            self.max_steps = a_star(self.grid, self.step)
-            self.step = min(self.step, self.max_steps)
+            self.max_steps = a_star(self.grid, self.step)  # Tìm số bước đi đến đích
+            self.step = min(
+                self.step, self.max_steps
+            )  # Đảm bảo bước hiện tại không vượt quá số bước đến đích
+
             self.slider.set_intervals(self.max_steps)
             self.slider.set_value(self.step)
+            # Cập nhật thanh trượt dựa vào số bước đi hiện tại và số bước đi đến đích
             self.draw(self.screen)
             self.path = backtrack_to_start(self.grid.get_end())
             pg.display.update()
 
     def handle_events(self):
-        """Handle all incoming events."""
+        """
+        Xử lý các sự kiện đầu vào từ người dùng như nhấn phím, nhấp chuột và kéo chuột.
+        """
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 quit(self)
@@ -71,7 +68,9 @@ class Game:
                 drag_toggle(self)
 
     def draw(self, surface: pg.Surface):
-        """Draw the grid and any active paths."""
+        """
+        Vẽ lưới và các đường đi, cũng như hiển thị thanh trượt trên màn hình.
+        """
         if self.grid is None:
             return
         draw_board(surface, self.grid, surface.get_rect(), self.mode)
@@ -82,11 +81,21 @@ class Game:
             draw_path(surface, self.grid, self.path)
 
     def init_grid(self, width: int, height: int):
-        """Creates a maze with walls dividing the grid into four sections with some random openings."""
+        """
+        Khởi tạo lưới cho trò chơi, tạo các ô trống và đặt ô bắt đầu và ô kết thúc.
+
+        Parameters:
+            width (int): Chiều rộng của lưới.
+            height (int): Chiều cao của lưới.
+
+        Returns:
+            CellGrid: Đối tượng lưới chứa các ô và các cài đặt.
+        """
         grid = [
             [Cell(type=CellType.Empty, pos=(x, y)) for y in range(height)]
             for x in range(width)
         ]
+        # Mảng 2 chiều chứa các ô kiểu Cell
 
         # # Adding walls in the middle row and column
         # for x in range(width):
@@ -111,10 +120,15 @@ class Game:
             random.randrange(width // 2 + 1, width),
             random.randrange(0, height // 2),
         )
+        # Ngẫu nhiên vị trí bắt đầu và kết thúc
+
         grid[start[0]][start[1]].mark = CellMark.Start
         grid[end[0]][end[1]].mark = CellMark.End
-        # Set the start cell to be empty
+        # Đặt ô bắt đầu và ô kết thúc
+
         grid[start[0]][start[1]].type = CellType.Empty
+        grid[end[0]][end[1]].type = CellType.Empty
+        # Ô bắt đầu và kết thúc không thể là vật cản
 
         return CellGrid(self.screen.get_rect(), grid, start, end)
 

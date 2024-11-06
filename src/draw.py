@@ -80,14 +80,17 @@ def draw_board(surface: pg.Surface, grid: CellGrid, area: pg.Rect, mode: Mode):
             if mark is not None:
                 # Nếu ô đó là ô bắt đầu hoặc ô kết thúc
                 # thì tô màu cho ô đó với màu tương ứng
-                pg.draw.rect(surface, mark, cell_rect, PATH_LINE_WIDTH)
+                pg.draw.rect(surface, mark, cell_rect)
+
+            if cell.is_current:
+                pg.draw.rect(surface, (0, 255, 255), cell_rect, PATH_LINE_WIDTH)
 
 
 def draw_path(surface: pg.Surface, grid: CellGrid, path: list[tuple[int, int]]):
     """
     Hàm vẽ đường đi từ ô bắt đầu đến ô kết thúc trên bề mặt Pygame.
 
-    Pảrameters:
+    Parameters:
         surface (pg.Surface): Bề mặt nơi đường đi sẽ được vẽ.
         grid (CellGrid): Đối tượng lưới chứa các ô.
         path (list[tuple[int, int]]): Danh sách các tọa độ của các ô trên đường đi từ ô bắt đầu đến ô kết thúc.

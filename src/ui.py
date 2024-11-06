@@ -129,7 +129,7 @@ class Arrow:
 
     def draw_arrow(self, surface, cell_center):
         """
-        Vẽ một mũi tên bên trong ô theo hướng `direction`.
+        Vẽ mũi tên bên trong ô theo hướng `direction`.
         """
         half_size = CELL_SIZE / 4
         if self.direction == ArrowDirection.Right:

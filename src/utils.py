@@ -12,6 +12,5 @@ def print_queue(q):
         priority, cell = item
         print(f"Priority: {priority}, Position: {cell.pos}, Count: {cell.count}")
 
-    # Restore items to the queue
     for item in temp_queue:
         q.put(item)
