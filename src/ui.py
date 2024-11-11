@@ -9,7 +9,7 @@ from src.config import (
     CELL_NEXT_COLOR,
     CELL_SIZE,
     FONT_COLOR,
-    FONT_SIZE,
+    LOGGER_FONT_SIZE,
     MARGIN,
     SCREEN_HEIGHT,
     SLIDER_BAR_COLOR,
@@ -195,7 +195,7 @@ Esc - Exit"""
         self.queue_items = None
         self.current_cell = None
         self.evaluations_count = 0
-        self.font = pg.font.SysFont(pg.font.get_default_font(), FONT_SIZE)
+        self.font = pg.font.SysFont(pg.font.get_default_font(), LOGGER_FONT_SIZE)
 
     def update(self, queue_items, current, count):
         """Cập nhật giá trị của logger
@@ -215,7 +215,7 @@ Esc - Exit"""
             self.font.render("Priority Queue:", True, FONT_COLOR),
             (
                 BOARD_SIZE + MARGIN + 10,
-                MARGIN + 10 + FONT_SIZE * 3,
+                MARGIN + 10 + LOGGER_FONT_SIZE * 3,
             ),
         )
 
@@ -233,7 +233,7 @@ Esc - Exit"""
             )
             surface.blit(
                 text,
-                (BOARD_SIZE + MARGIN + 10, MARGIN + 10 + (i + 4) * FONT_SIZE),
+                (BOARD_SIZE + MARGIN + 10, MARGIN + 10 + (i + 4) * LOGGER_FONT_SIZE),
             )
 
     def draw_instruction(self, surface: pg.Surface):
@@ -243,7 +243,8 @@ Esc - Exit"""
             text_surface = self.font.render(line, True, FONT_COLOR)
 
             surface.blit(
-                text_surface, (BOARD_SIZE + MARGIN, BOARD_SIZE + 40 + i * FONT_SIZE)
+                text_surface,
+                (BOARD_SIZE + MARGIN, BOARD_SIZE + 40 + i * LOGGER_FONT_SIZE),
             )
 
     def draw_current(self, surface: pg.Surface):
@@ -260,7 +261,7 @@ Esc - Exit"""
                 True,
                 CELL_CURRENT_COLOR,
             ),
-            (BOARD_SIZE + MARGIN + 10, MARGIN + 10 + FONT_SIZE),
+            (BOARD_SIZE + MARGIN + 10, MARGIN + 10 + LOGGER_FONT_SIZE),
         )
 
     def draw_log(self, surface: pg.Surface):
