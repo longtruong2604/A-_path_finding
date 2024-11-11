@@ -5,6 +5,8 @@ import pygame as pg
 from src.config import (
     CELL_COLOR_EMPTY,
     CELL_COLOR_WALL,
+    CELL_CURRENT_COLOR,
+    CELL_NEXT_COLOR,
     FONT_COLOR,
     FONT_SIZE,
     PATH_LINE_WIDTH,
@@ -55,12 +57,12 @@ def draw_board(surface: pg.Surface, grid: CellGrid, area: pg.Rect, mode: Mode):
                 surface, colors.get(cell.type, (0, 255, 0)), cell_rect
             )  # Vẽ ô với màu tương ứng với loại ô: trống hoặc vật cản
 
-            if mode == Mode.Cost and cell.count != math.inf:
+            if mode == Mode.Cost and cell.cost != math.inf:
                 # Nếu chế độ hiển thị là Cost và ô có chi phí khác vô cực
                 # thì vẽ chi phí lên tâm của ô
 
                 count_text = cell_font.render(
-                    str(round(cell.priority, 2)), True, FONT_COLOR
+                    str(round(cell.cost + cell.heuristic, 2)), True, FONT_COLOR
                 )
 
                 cell_x, cell_y, cell_width, cell_height = cell_rect
@@ -83,7 +85,10 @@ def draw_board(surface: pg.Surface, grid: CellGrid, area: pg.Rect, mode: Mode):
                 pg.draw.rect(surface, mark, cell_rect)
 
             if cell.is_current:
-                pg.draw.rect(surface, (0, 255, 255), cell_rect, PATH_LINE_WIDTH)
+                pg.draw.rect(surface, CELL_CURRENT_COLOR, cell_rect, PATH_LINE_WIDTH)
+
+            if cell.is_next:
+                pg.draw.rect(surface, CELL_NEXT_COLOR, cell_rect, PATH_LINE_WIDTH)
 
 
 def draw_path(surface: pg.Surface, grid: CellGrid, path: list[tuple[int, int]]):

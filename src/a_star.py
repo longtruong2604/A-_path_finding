@@ -1,9 +1,11 @@
 import math
 from queue import PriorityQueue
+
 from src.grid import Cell, CellGrid
+from src.ui import Logger
 
 
-def a_star(grid: CellGrid, step: int) -> int:
+def a_star(grid: CellGrid, step: int, logger: Logger) -> int:
     """
     Hàm thực hiện thuật toán A*.
     Hàm sẽ thực hiện việc tìm kiếm và trả về số bước tối đa bằng cách sử dụng trọng số ẩn của mỗi ô,
@@ -18,10 +20,15 @@ def a_star(grid: CellGrid, step: int) -> int:
         int: Tổng số bước tối đa để thực hiện quá trình tìm kiếm.
     """
 
-    grid.clear_count(math.inf)  # Xóa thông tin cũ
+    grid.clear_count()  # Xóa thông tin cũ
     start, end = grid.get_start(), grid.get_end()  # Vị trí bắt đầu và vị trí kết thúc
     start.hidden = 0  # Trọng ẩn của mỗi ô, tương dương với count nhưng ẩn
+    start.update_cell(
+        0, None, heuristic(end.pos, start.pos)
+    )  # Update giá trị của ô bắt đầu
     max_steps = 0  # Biến đêm số bước tối đa
+
+    initial_step = step
 
     frontier = PriorityQueue()  # Hàng đợi ưu tiên
     frontier.put((0, start))  # Thêm vị trí bắt đầu vào hàng đợi
@@ -45,18 +52,26 @@ def a_star(grid: CellGrid, step: int) -> int:
             new_cost = current.hidden + 1
             if next.pos not in visited or new_cost < next.hidden:
                 visited.add(next.pos)
-                priority = new_cost + heuristic(end.pos, next.pos)
+                heuristic_value = heuristic(end.pos, next.pos)
+                priority = new_cost + heuristic_value
                 # Nếu ô lân cận chưa được duyệt hoặc có trọng số mới nhỏ hơn trọng số cũ
                 # thì cập nhật trọng số mới và thêm vào hàng đợi ưu tiên với độ ưu tiên dựa vào
                 # số bước từ ô bắt đầu + hàm lượng giá từ ô hiện tại đến ô kết thúc
                 next.hidden = new_cost
                 frontier.put((priority, next))
                 if step > 0:
-                    next.update_cell(new_cost, priority, current)
+                    next.update_cell(new_cost, current, heuristic_value)
                     # Cập nhật thông tin của ô lân cận bao gồm số bước, trọng số, tọa độ ô hiện tại (để truy vết)
                     # để hiển thị trên lưới nếu số bước (step) còn lớn hơn 0
-                if step == 1:
-                    current.is_current = True  # Đánh dấu ô hiện tại là ô đang được xét
+        if step == 1:
+            current.is_current = True  # Đánh dấu ô hiện tại là ô đang được xét
+            list(frontier.queue)[0][
+                1
+            ].is_next = True  # Đánh dấu ô đầu tiên trong queue là ô được xét tiếp theo
+            logger.update(
+                list(frontier.queue), current, initial_step
+            )  # Cập nhật thông tin cho logger
+
         max_steps += 1
         step -= 1
 

@@ -1,28 +1,28 @@
-import random
 import pygame as pg
 
-from src.a_star import backtrack_to_start, a_star
+from src.a_star import a_star, backtrack_to_start
 from src.config import (
     BOARD_SIZE,
     GAME_TITLE,
     GRID_SIZE,
     SCREEN_HEIGHT,
+    SCREEN_WIDTH,
     SLIDER_HEIGHT,
     SLIDER_WIDTH,
 )
-from src.types import CellMark, CellType, Mode
 from src.draw import draw_board, draw_path
-from src.events import drag_toggle, end_drag, handle_keydown, start_drag, quit
-from src.grid import Cell, CellGrid
-from src.ui import Slider
+from src.events import drag_toggle, end_drag, handle_keydown, quit, start_drag
+from src.grid import CellGrid
+from src.map_generation import gen_grid, get_random_empty_cell
+from src.types import Mode
+from src.ui import Logger, Slider
 
 
 class Game:
     def __init__(self):
         pg.init()
-        self.screen = pg.display.set_mode((BOARD_SIZE, SCREEN_HEIGHT))
+        self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pg.display.set_caption(GAME_TITLE)
-
         self.grid: CellGrid = self.init_grid(GRID_SIZE, GRID_SIZE)
         self.slider = Slider(
             (BOARD_SIZE - SLIDER_WIDTH) // 2,
@@ -30,7 +30,7 @@ class Game:
             SLIDER_WIDTH,
             SLIDER_HEIGHT,
         )
-
+        self.logger = Logger()  # Khởi tạo Logger
         self.path = None  # Đường đi từ vị trí đầu đến cuối
         self.mouse_held = False
         self.step = 0  # Bước đi trong quá trình tìm đường
@@ -39,7 +39,8 @@ class Game:
     def loop(self):
         while True:
             self.handle_events()
-            self.max_steps = a_star(self.grid, self.step)  # Tìm số bước đi đến đích
+            self.max_steps = a_star(self.grid, self.step, self.logger)
+            # Tìm số bước đi đến đích
             self.step = min(
                 self.step, self.max_steps
             )  # Đảm bảo bước hiện tại không vượt quá số bước đến đích
@@ -76,9 +77,12 @@ class Game:
         draw_board(surface, self.grid, surface.get_rect(), self.mode)
         if self.slider is not None:
             self.slider.draw(surface)
-        # Uncomment if you want to draw paths
+        # Vẽ đường đi nếu có
         if self.path is not None:
             draw_path(surface, self.grid, self.path)
+
+        # Vẽ thông tin logger
+        self.logger.draw_log(surface)
 
     def init_grid(self, width: int, height: int):
         """
@@ -91,46 +95,11 @@ class Game:
         Returns:
             CellGrid: Đối tượng lưới chứa các ô và các cài đặt.
         """
-        grid = [
-            [Cell(type=CellType.Empty, pos=(x, y)) for y in range(height)]
-            for x in range(width)
-        ]
-        # Mảng 2 chiều chứa các ô kiểu Cell
+        grid = gen_grid(width, height)
+        # Sinh bản đồ một cách ngẫu nhiên
 
-        # Adding walls in the middle row and column
-        for x in range(width):
-            grid[x][height // 2].type = CellType.Wall
-        for y in range(height):
-            grid[width // 2][y].type = CellType.Wall
-
-        # Creating openings in the walls
-        grid[random.randint(0, width // 2 - 1)][height // 2].type = CellType.Empty
-        grid[random.randint(width // 2 + 1, width - 1)][
-            height // 2
-        ].type = CellType.Empty
-        grid[width // 2][random.randint(0, height // 2 - 1)].type = CellType.Empty
-        grid[width // 2][
-            random.randint(height // 2 + 1, height - 1)
-        ].type = CellType.Empty
-
-        start = (
-            random.randrange(0, width // 2),
-            random.randrange(height // 2 + 1, height),
-        )
-
-        end = (
-            random.randrange(width // 2 + 1, width),
-            random.randrange(0, height // 2),
-        )
-        # Ngẫu nhiên vị trí bắt đầu và kết thúc
-
-        grid[start[0]][start[1]].mark = CellMark.Start
-        grid[end[0]][end[1]].mark = CellMark.End
-        # Đặt ô bắt đầu và ô kết thúc
-
-        grid[start[0]][start[1]].type = CellType.Empty
-        grid[end[0]][end[1]].type = CellType.Empty
-        # Ô bắt đầu và kết thúc không thể là vật cản
+        start, end = (get_random_empty_cell(grid), get_random_empty_cell(grid))
+        # Sinh ô bắt đầu và ô kết thúc
 
         return CellGrid(self.screen.get_rect(), grid, start, end)
 

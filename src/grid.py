@@ -31,21 +31,22 @@ class Cell:
 
     def __init__(self, type=CellType.Empty, pos=None):
         self.type = type
-        self.count = math.inf
-        self.priority = math.inf
+        self.cost = math.inf
+        self.heuristic = math.inf
         self.mark = CellMark.No
         self.path_from: None | Cell = None
         self.arrow: Arrow = None
         self.pos: None | tuple[int, int] = pos
-        self.hidden = 0
+        self.hidden = math.inf
         self.is_current = False
+        self.is_next = False
 
     def __lt__(self, other):
         """
         So sánh hai ô dựa trên số bước kể từ ô bắt đầu (count)
         để hỗ trợ cho hàng đợi ưu tiên.
         """
-        return self.count > other.count
+        return self.cost > other.cost
 
     def is_start(self):
         return self.mark == CellMark.Start
@@ -60,18 +61,19 @@ class Cell:
         """
         self.type = CellType.Wall if self.type == CellType.Empty else CellType.Empty
 
-    def update_cell(self, count, priority, path_from):
+    def update_cell(self, count: int, path_from: Cell, heuristic: float):
         """
         Cập nhật ô với số bước kể từ ô bắt đầu,
         độ ưu tiên và ô trước đó trong đường đi.
         Parameters:
-            count (int): Giá trị đếm cho ô.
-            priority (float): Độ ưu tiên của ô.
+            cost (int): Giá trị đếm cho ô.
             path_from (Cell): Ô trước đó trong đường đi đến ô hiện tại.
+            heuristic (float): Giá trị của hàm lượng giá tại ô
         """
-        self.count = count
+        self.cost = count
         self.path_from = path_from
-        self.priority = priority
+        self.heuristic = heuristic
+
         if path_from is not None:
             if path_from.pos[0] < self.pos[0]:
                 self.arrow = Arrow(ArrowDirection.Left)
@@ -188,32 +190,37 @@ class CellGrid:
         """
         return self.grid[pos[0]][pos[1]]
 
-    def clear_count(self, count: int) -> None:
-        """Resets all cell counts to a specific value, typically used to clear path data."""
+    def clear_count(self) -> None:
+        """
+        Reset các giá trị của ô về ban đầu
+        """
         for row in self.grid:
             for cell in row:
-                cell.count = count
+                cell.cost = math.inf if cell.mark != CellMark.Start else 0
+                cell.hidden = math.inf if cell.mark != CellMark.Start else 0
                 cell.path_from = None
                 cell.arrow = None
                 cell.is_current = False
+                cell.is_next = False
 
     def set_start(self, pos: tuple[int, int]) -> None:
-        """Sets the start cell."""
+        """Đặt các gái trị của ô bắt đầu."""
         self.start = pos
         self.at(pos).mark = CellMark.Start
-        self.at(pos).count = 0
+        self.at(pos).cost = 0
+        self.at(pos).hidden = 0
 
     def set_end(self, pos: tuple[int, int]) -> None:
-        """Sets the end cell."""
+        """Đặt các giá trị của ô kết thúc"""
         self.end = pos
         self.at(pos).mark = CellMark.End
 
     def get_start(self) -> Cell:
-        """Sets the start cell."""
+        """Lấy ô bắt đầu"""
         return self.grid[self.start[0]][self.start[1]]
 
     def get_end(self) -> Cell:
-        """Sets the end cell."""
+        """Lấy ô kết thúc"""
         return self.grid[self.end[0]][self.end[1]]
 
     def get_neighbors(self, pos: tuple[int, int]) -> list[Cell]:

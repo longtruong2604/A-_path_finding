@@ -99,7 +99,7 @@ def drag_toggle(self):
 
     # Nếu đang kéo ô bắt đầu hoặc ô kết thúc, di chuyển chúng đến vị trí mới
     if self.grid.dragging_start:
-        self.grid.get_start().count = math.inf
+        self.grid.get_start().cost = math.inf
         self.grid.get_start().mark = CellMark.No  # Xóa ô bắt đầu trước đó
         self.grid.set_start((pos_x, pos_y))  # Di chuyển ô bắt đầu đến vị trí mới
     elif self.grid.dragging_end:

@@ -3,7 +3,15 @@ import pygame as pg
 from src.config import (
     ARROW_COLOR,
     ARROW_SIZE,
+    BOARD_SIZE,
+    CELL_COLOR_EMPTY,
+    CELL_CURRENT_COLOR,
+    CELL_NEXT_COLOR,
     CELL_SIZE,
+    FONT_COLOR,
+    FONT_SIZE,
+    MARGIN,
+    SCREEN_HEIGHT,
     SLIDER_BAR_COLOR,
     SLIDER_THUMB_COLOR,
     SLIDER_THUMB_SIZE,
@@ -163,3 +171,113 @@ class Arrow:
         )
 
         pg.draw.polygon(surface, ARROW_COLOR, [arrow_end, left_point, right_point])
+
+
+class Logger:
+    """
+    Lớp đại diện cho cửa sổ thông tin.
+
+    Attributes:
+        queue_items (PriorityQueue): Priority queue hiện tại.
+        curent_cell = Cell: Ô hiện tại đang được khám phá
+        evaluations_count = int: Số ô đã được khám phá
+
+    """
+
+    HEADER_TEXT = """Keys:
+Left - Decrease step
+Right - Increase step
+R - create a new maze
+M - change display mode
+Esc - Exit"""
+
+    def __init__(self):
+        self.queue_items = None
+        self.current_cell = None
+        self.evaluations_count = 0
+        self.font = pg.font.SysFont(pg.font.get_default_font(), FONT_SIZE)
+
+    def update(self, queue_items, current, count):
+        """Cập nhật giá trị của logger
+
+        Args:
+            queue_items (list[(Priority, Cell)]): Priority Queue dưới dạng danh sách
+            current (Cell): Cell hiện tại đang được khám phá
+            count (int): Số ô đa được khám phá
+        """
+        self.current_cell = current
+        self.queue_items = queue_items
+        self.evaluations_count = count
+
+    def draw_queue(self, surface: pg.Surface):
+        """Vẽ Priority hiện tại lên logger"""
+        surface.blit(
+            self.font.render("Priority Queue:", True, FONT_COLOR),
+            (
+                BOARD_SIZE + MARGIN + 10,
+                MARGIN + 10 + FONT_SIZE * 3,
+            ),
+        )
+
+        for i, (_, cell) in enumerate(self.queue_items):
+            if i >= 20:  # Giới hạn số dòng có thể hiển thị là 20
+                break
+
+            color = CELL_NEXT_COLOR if i == 0 else FONT_COLOR
+            # Giá trị đầu tiên trong Priority Queue (ô tiếp theo được khám phá) sẽ được tô màu khác
+
+            text = self.font.render(
+                f"Priority: {cell.cost} + {cell.heuristic}, Position: {cell.pos}",
+                True,
+                color,
+            )
+            surface.blit(
+                text,
+                (BOARD_SIZE + MARGIN + 10, MARGIN + 10 + (i + 4) * FONT_SIZE),
+            )
+
+    def draw_instruction(self, surface: pg.Surface):
+        """Vẽ các hướng dẫn"""
+        header_lines = Logger.HEADER_TEXT.splitlines()
+        for i, line in enumerate(header_lines):
+            text_surface = self.font.render(line, True, FONT_COLOR)
+
+            surface.blit(
+                text_surface, (BOARD_SIZE + MARGIN, BOARD_SIZE + 40 + i * FONT_SIZE)
+            )
+
+    def draw_current(self, surface: pg.Surface):
+        """Vẽ ô đang được khám phá và số lượng ô đã được khám phá"""
+        surface.blit(
+            self.font.render(
+                f"Evaluation count: {self.evaluations_count}", 1, FONT_COLOR
+            ),
+            (BOARD_SIZE + MARGIN + 10, MARGIN + 10),
+        )
+        surface.blit(
+            self.font.render(
+                f"Current: {self.current_cell.cost} + {self.current_cell.heuristic}, Position: {self.current_cell.pos}",
+                True,
+                CELL_CURRENT_COLOR,
+            ),
+            (BOARD_SIZE + MARGIN + 10, MARGIN + 10 + FONT_SIZE),
+        )
+
+    def draw_log(self, surface: pg.Surface):
+        """
+        Vẽ các thông tin lên logger
+        """
+        pg.draw.rect(
+            surface,
+            CELL_COLOR_EMPTY,
+            (BOARD_SIZE, MARGIN, 300 - MARGIN, SCREEN_HEIGHT - MARGIN * 2),
+        )  # Vẽ background
+        self.draw_instruction(surface)
+
+        if self.queue_items is None:
+            return
+
+        self.draw_current(surface)
+        self.draw_queue(surface)
+
+        pg.display.update()
