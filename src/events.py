@@ -3,7 +3,7 @@ import sys
 import math
 
 from src.config import BOARD_SIZE, GRID_SIZE
-from src.types import CellMark, Mode
+from src.types import CellMark, HeuristicType, Mode
 
 
 def handle_keydown(self, event):
@@ -26,6 +26,8 @@ def handle_keydown(self, event):
     elif event.key == pg.K_m:
         self.mode = Mode.Cost if self.mode == Mode.Arrow else Mode.Arrow
         # Chuyển đổi chế độ hiển thị giữa Cost và Arrow
+    elif event.key == pg.K_h:
+        self.heuristic = HeuristicType((self.heuristic.value + 1) % len(HeuristicType))
 
 
 def start_drag(self):

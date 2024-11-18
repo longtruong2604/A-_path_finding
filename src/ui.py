@@ -59,7 +59,7 @@ class Slider:
 
     def set_intervals(self, intervals):
         """
-        Lấy giá trị hiện tại của thanh trượt.
+        Đặt số khoản của của thanh trượt.
         """
         self.intervals = intervals
         self.interval_width = self.sliderRect.w / intervals
@@ -184,20 +184,22 @@ class Logger:
 
     """
 
-    HEADER_TEXT = """Keys:
+    HEADER_TEXT = """___Instruction___:
 Left - Decrease step
 Right - Increase step
 R - create a new maze
 M - change display mode
+H - change heuristic
 Esc - Exit"""
 
     def __init__(self):
         self.queue_items = None
         self.current_cell = None
+        self.heuristic = None
         self.evaluations_count = 0
         self.font = pg.font.SysFont(pg.font.get_default_font(), LOGGER_FONT_SIZE)
 
-    def update(self, queue_items, current, count):
+    def update(self, queue_items, current, count, heuristic):
         """Cập nhật giá trị của logger
 
         Args:
@@ -208,14 +210,15 @@ Esc - Exit"""
         self.current_cell = current
         self.queue_items = queue_items
         self.evaluations_count = count
+        self.heuristic = heuristic
 
     def draw_queue(self, surface: pg.Surface):
         """Vẽ Priority hiện tại lên logger"""
         surface.blit(
             self.font.render("Priority Queue:", True, FONT_COLOR),
             (
-                BOARD_SIZE + MARGIN + 10,
-                MARGIN + 10 + LOGGER_FONT_SIZE * 3,
+                BOARD_SIZE + MARGIN,
+                MARGIN + 20 + LOGGER_FONT_SIZE * 3,
             ),
         )
 
@@ -227,13 +230,13 @@ Esc - Exit"""
             # Giá trị đầu tiên trong Priority Queue (ô tiếp theo được khám phá) sẽ được tô màu khác
 
             text = self.font.render(
-                f"Priority: {cell.cost} + {cell.heuristic}, Position: {cell.pos}",
+                f"Priority: {cell.cost} + {round(cell.heuristic, 2)}, Position: {cell.pos}",
                 True,
                 color,
             )
             surface.blit(
                 text,
-                (BOARD_SIZE + MARGIN + 10, MARGIN + 10 + (i + 4) * LOGGER_FONT_SIZE),
+                (BOARD_SIZE + MARGIN, MARGIN + 20 + (i + 4) * LOGGER_FONT_SIZE),
             )
 
     def draw_instruction(self, surface: pg.Surface):
@@ -244,24 +247,34 @@ Esc - Exit"""
 
             surface.blit(
                 text_surface,
-                (BOARD_SIZE + MARGIN, BOARD_SIZE + 40 + i * LOGGER_FONT_SIZE),
+                (BOARD_SIZE + MARGIN, BOARD_SIZE - 70 + i * LOGGER_FONT_SIZE),
             )
 
     def draw_current(self, surface: pg.Surface):
         """Vẽ ô đang được khám phá và số lượng ô đã được khám phá"""
         surface.blit(
             self.font.render(
-                f"Evaluation count: {self.evaluations_count}", 1, FONT_COLOR
+                f"Evaluation count: {self.evaluations_count}",
+                1,
+                FONT_COLOR,
             ),
-            (BOARD_SIZE + MARGIN + 10, MARGIN + 10),
+            (BOARD_SIZE + MARGIN, MARGIN + 10),
         )
         surface.blit(
             self.font.render(
-                f"Current: {self.current_cell.cost} + {self.current_cell.heuristic}, Position: {self.current_cell.pos}",
+                f"Heuristic func: {self.heuristic.name}",
+                1,
+                FONT_COLOR,
+            ),
+            (BOARD_SIZE + MARGIN, MARGIN + 10 + LOGGER_FONT_SIZE),
+        )
+        surface.blit(
+            self.font.render(
+                f"Current: {self.current_cell.cost} + {round(self.current_cell.heuristic,2)}, Position: {self.current_cell.pos}",
                 True,
                 CELL_CURRENT_COLOR,
             ),
-            (BOARD_SIZE + MARGIN + 10, MARGIN + 10 + LOGGER_FONT_SIZE),
+            (BOARD_SIZE + MARGIN, MARGIN + 10 + LOGGER_FONT_SIZE * 2),
         )
 
     def draw_log(self, surface: pg.Surface):

@@ -46,7 +46,7 @@ class Cell:
         So sánh hai ô dựa trên số bước kể từ ô bắt đầu (count)
         để hỗ trợ cho hàng đợi ưu tiên.
         """
-        return self.cost > other.cost
+        return self.hidden > other.hidden
 
     def is_start(self):
         return self.mark == CellMark.Start

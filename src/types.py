@@ -22,3 +22,9 @@ class ArrowDirection(Enum):
 class Mode(Enum):
     Cost = 1
     Arrow = 2
+
+
+class HeuristicType(Enum):
+    MANHATTAN = 0
+    EUCLIDEAN = 1
+    COMBINED = 2

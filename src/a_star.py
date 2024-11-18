@@ -2,10 +2,13 @@ import math
 from queue import PriorityQueue
 
 from src.grid import Cell, CellGrid
+from src.types import HeuristicType
 from src.ui import Logger
 
 
-def a_star(grid: CellGrid, step: int, logger: Logger) -> int:
+def a_star(
+    grid: CellGrid, step: int, logger: Logger, heuristic_type: HeuristicType
+) -> int:
     """
     Hàm thực hiện thuật toán A*.
     Hàm sẽ thực hiện việc tìm kiếm và trả về số bước tối đa bằng cách sử dụng trọng số ẩn của mỗi ô,
@@ -24,7 +27,7 @@ def a_star(grid: CellGrid, step: int, logger: Logger) -> int:
     start, end = grid.get_start(), grid.get_end()  # Vị trí bắt đầu và vị trí kết thúc
     start.hidden = 0  # Trọng ẩn của mỗi ô, tương dương với count nhưng ẩn
     start.update_cell(
-        0, None, heuristic(end.pos, start.pos)
+        0, None, heuristic(end.pos, start.pos, heuristic_type)
     )  # Update giá trị của ô bắt đầu
     max_steps = 0  # Biến đêm số bước tối đa
 
@@ -52,7 +55,7 @@ def a_star(grid: CellGrid, step: int, logger: Logger) -> int:
             new_cost = current.hidden + 1
             if next.pos not in visited or new_cost < next.hidden:
                 visited.add(next.pos)
-                heuristic_value = heuristic(end.pos, next.pos)
+                heuristic_value = heuristic(end.pos, next.pos, heuristic_type)
                 priority = new_cost + heuristic_value
                 # Nếu ô lân cận chưa được duyệt hoặc có trọng số mới nhỏ hơn trọng số cũ
                 # thì cập nhật trọng số mới và thêm vào hàng đợi ưu tiên với độ ưu tiên dựa vào
@@ -69,7 +72,7 @@ def a_star(grid: CellGrid, step: int, logger: Logger) -> int:
                 1
             ].is_next = True  # Đánh dấu ô đầu tiên trong queue là ô được xét tiếp theo
             logger.update(
-                list(frontier.queue), current, initial_step
+                list(frontier.queue), current, initial_step, heuristic_type
             )  # Cập nhật thông tin cho logger
 
         max_steps += 1
@@ -100,7 +103,7 @@ def backtrack_to_start(end: Cell) -> list[tuple[int, int]]:
     return path
 
 
-def manhatan_distance(a: tuple[int, int], b: tuple[int, int]) -> int:
+def manhattan_distance(a: tuple[int, int], b: tuple[int, int]) -> int:
     # Hàm tính khoảng cách Manhattan giữa 2 điểm
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
@@ -110,8 +113,15 @@ def euclidean_distance(a: tuple[int, int], b: tuple[int, int]) -> float:
     return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
 
-def heuristic(goal: tuple[int, int], next: tuple[int, int]):
-    # Hàm lượng giá (heuristic) để ước lượng khoảng cách từ ô kết thúc đến ô cần tính
-    # return euclidean_distance(goal, next)
-    # return manhatan_distance(goal, next) + euclidean_distance(goal, next)
-    return manhatan_distance(goal, next)
+def heuristic(
+    goal: tuple[int, int], next: tuple[int, int], heuristic: HeuristicType
+) -> float:
+    """Estimate the distance from the next point to the goal using the selected heuristic."""
+    if heuristic == HeuristicType.MANHATTAN:
+        return manhattan_distance(goal, next)
+    elif heuristic == HeuristicType.EUCLIDEAN:
+        return euclidean_distance(goal, next)
+    elif heuristic == HeuristicType.COMBINED:
+        return manhattan_distance(goal, next) + euclidean_distance(goal, next)
+    else:
+        raise ValueError("Invalid heuristic type selected.")

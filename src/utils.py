@@ -14,3 +14,28 @@ def print_queue(q):
 
     for item in temp_queue:
         q.put(item)
+
+
+def read_input(file_path: str):
+    """
+    Đọc file input.
+
+    Parameters:
+        file_path (str): Đường dẫn đến file input
+    """
+    with open(file_path, "r") as file:
+        lines = file.readlines()
+
+    # Đọc kích thước bản đồ
+    size = int(lines[0].strip())
+
+    # Đọc vị trí các vật cản
+    walls = [
+        tuple(map(int, pos.strip("()").split(",")))
+        for pos in lines[1].strip().split("),(")
+    ]
+
+    # Đọc vị trí ô bắt đầu và ô kết thúc
+    start = tuple(map(int, lines[2].strip("((\n)").split(",")))
+    end = tuple(map(int, lines[3].strip("((\n)").split(",")))
+    return size, walls, start, end
